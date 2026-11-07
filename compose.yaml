@@ -1,0 +1,20 @@
+services:
+  crosslist:
+    build: .
+    container_name: crosslist-web
+    restart: unless-stopped
+    environment:
+      CROSSLIST_USERNAME: ${CROSSLIST_USERNAME:-admin}
+      CROSSLIST_PASSWORD: ${CROSSLIST_PASSWORD:?Set CROSSLIST_PASSWORD in .env}
+      CROSSLIST_DB: /data/crosslist.sqlite3
+    ports:
+      - "127.0.0.1:${CROSSLIST_PORT:-8787}:8000"
+    volumes:
+      - crosslist_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+volumes:
+  crosslist_data:
